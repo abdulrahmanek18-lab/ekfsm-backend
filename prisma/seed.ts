@@ -1,5 +1,5 @@
 import { PrismaClient, UserRole, Priority, WOStatus, AMCStatus, AMCPaymentType, PPMStatus, EMIStatus, InvoiceStatus, PaymentMethod, POStatus, ExpenseStatus, NotificationType, AssetStatus } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
