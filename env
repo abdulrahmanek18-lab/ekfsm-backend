@@ -10,7 +10,7 @@ API_PREFIX=api
 API_VERSION=v1
 
 # ── Database (PostgreSQL) ──
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ekfsm?schema=public"
+DATABASE_URL=DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ekfsm?schema=public"
 # Connection pool tuning (optional, appended to URL or set here)
 # DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ekfsm?schema=public&connection_limit=20&pool_timeout=30"
 
