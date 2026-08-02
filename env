@@ -1,0 +1,83 @@
+# ============================================
+# ekFSM - Facilities Management ERP
+# Backend Environment Configuration
+# ============================================
+
+# ── Application ──
+NODE_ENV=development
+PORT=3000
+API_PREFIX=api
+API_VERSION=v1
+
+# ── Database (PostgreSQL) ──
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ekfsm?schema=public"
+# Connection pool tuning (optional, appended to URL or set here)
+# DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ekfsm?schema=public&connection_limit=20&pool_timeout=30"
+
+# ── Redis ──
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+
+# ── MinIO / S3 Object Storage ──
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
+MINIO_USE_SSL=false
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET_NAME=ekfsm-uploads
+# Public URL for generating signed links (use MinIO console or CDN in production)
+MINIO_PUBLIC_URL=http://localhost:9000
+
+# ── AWS S3 (Alternative to MinIO) ──
+# AWS_REGION=us-east-1
+# AWS_ACCESS_KEY_ID=
+# AWS_SECRET_ACCESS_KEY=
+# AWS_S3_BUCKET_NAME=
+
+# ── Authentication ──
+JWT_SECRET=ffa13eda444eb564b80c6b44198071b681c347a7af8a8ee8774d7f48aa2036136afd11d66ba509870c15b086918bd16a0df4258f54c6c278ed8f90d8b4b3870d
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_SECRET=ca2e0f132343d91d199bc20721bf90bc93819ecc457816e6dfbbbdeb723d20baa381fd08884392c5f946a7761b0a418504286797ac5ac6cca4427c9c9bcf4ba1
+JWT_REFRESH_EXPIRES_IN=30d
+
+# ── Firebase / FCM Push Notifications ──
+FIREBASE_PROJECT_ID=
+FIREBASE_PRIVATE_KEY=
+FIREBASE_CLIENT_EMAIL=
+# Or path to service account JSON file
+# GOOGLE_APPLICATION_CREDENTIALS=./firebase-service-account.json
+
+# ── Company / Tenant Defaults ──
+DEFAULT_COMPANY_NAME="ekFSM Facilities"
+DEFAULT_COMPANY_TRN=1234567890123
+DEFAULT_CURRENCY=AED
+DEFAULT_TIMEZONE=Asia/Dubai
+DEFAULT_LANGUAGE=en
+
+# ── Invoice / VAT Settings (UAE) ──
+VAT_PERCENTAGE=5
+INVOICE_PREFIX=INV-
+QUOTATION_PREFIX=QUO-
+PO_PREFIX=PO-
+WO_PREFIX=WO-
+AMC_PREFIX=AMC-
+
+# ── Email / SMTP (Optional) ──
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=noreply@ekfsm.com
+
+# ── Socket.io / Real-time ──
+SOCKET_CORS_ORIGIN=http://localhost:3001
+
+# ── Logging ──
+LOG_LEVEL=debug
+LOG_PRETTY=true
+
+# ── Rate Limiting ──
+THROTTLE_TTL=60
+THROTTLE_LIMIT=100
