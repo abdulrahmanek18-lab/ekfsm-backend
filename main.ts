@@ -9,11 +9,14 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api');
 
-  // CORS
-  app.enableCors({
-    origin: ['http://localhost:3001', 'http://localhost:19006'],
-    credentials: true,
-  });
+ app.enableCors({
+  origin: [
+    'http://localhost:3001', 
+    'http://localhost:19006',
+    'https://abdulrahmanek18-lab.github.io'  // ← Just the domain, no path
+  ],
+  credentials: true,
+});
 
   // Validation
   app.useGlobalPipes(
