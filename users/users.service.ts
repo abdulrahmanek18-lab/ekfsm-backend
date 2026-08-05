@@ -12,6 +12,7 @@ export class UsersService {
       data: {
         ...data,
         password: hashedPassword,
+        companyId: data.companyId || '00000000-0000-0000-0000-000000000001',
       },
       select: {
         id: true,
