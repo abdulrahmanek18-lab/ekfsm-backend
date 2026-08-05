@@ -13,6 +13,7 @@ export class UsersService {
         ...data,
         password: hashedPassword,
         companyId: data.companyId || '00000000-0000-0000-0000-000000000001',
+                role: data.role ? data.role.toUpperCase() : 'TECHNICIAN',
       },
       select: {
         id: true,
