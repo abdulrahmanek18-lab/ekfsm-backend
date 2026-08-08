@@ -13,7 +13,7 @@ async function bootstrap() {
   origin: [
     'http://localhost:3001', 
     'http://localhost:19006',
-    'https://makinfratech-fsm.onrender.com'  // ← ADD THIS
+    'https://abdulrahmanek18-lab.github.io'  // ← Your FRONTEND (GitHub Pages)
   ],
   credentials: true,
 });
