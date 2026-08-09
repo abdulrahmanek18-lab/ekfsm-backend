@@ -70,3 +70,10 @@ export class InvoicesService {
     });
   }
 }
+  // Add this to the bottom of your InvoicesService class
+  async findOne(id: string) {
+    return this.prisma.invoice.findUnique({
+      where: { id },
+      include: { customer: true },
+    });
+  }
