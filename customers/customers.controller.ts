@@ -1,14 +1,13 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 
 @Controller('customers')
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
-  // Make sure this exists! If it is missing, you will get "Cannot POST"
   @Post()
-  create(@Body() createCustomerDto: any) {
-    return this.customersService.create(createCustomerDto);
+  create(@Body() body: any) {
+    return this.customersService.create(body);
   }
 
   @Get()
