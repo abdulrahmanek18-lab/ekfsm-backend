@@ -6,7 +6,7 @@ import { InvoicesExtraService } from './invoices-extra.service';
 export class InvoicesController {
   constructor(
     private readonly invoicesService: InvoicesService,
-    private readonly invoicesExtraService: InvoicesExtraService // <-- Inject it
+    private readonly invoicesExtraService: InvoicesExtraService
   ) {}
 
   @Post()
@@ -19,13 +19,17 @@ export class InvoicesController {
     return this.invoicesService.findAll();
   }
 
-  // New Route: Update Status (e.g., mark as PAID)
+  // NEW: Route to get a single invoice by ID
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.invoicesService.findOne(id);
+  }
+
   @Patch(':id/status')
   updateStatus(@Param('id') id: string, @Body() body: any) {
     return this.invoicesExtraService.updateStatus(id, body.companyId, body.status);
   }
 
-  // New Route: Void Invoice
   @Patch(':id/void')
   voidInvoice(@Param('id') id: string, @Body() body: any) {
     return this.invoicesExtraService.voidInvoice(id, body.companyId, body.reason);
