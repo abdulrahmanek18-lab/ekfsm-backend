@@ -9,18 +9,17 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api');
 
- app.enableCors({
-  origin: [
-    'http://localhost:3001', 
-    'http://localhost:19006',
-    'https://abdulrahmanek18-lab.github.io', // Keep this just in case
-    'https://abdulrahmanek18-lab.github.io/mak-infratech-fsm-frontend/', // ADD YOUR EXACT GITHUB PAGES URL HERE
-    'https://abdulrahmanek18-lab.github.io/ekfsm-backend/',
-    // Also add your live backend URL if you have one
-  ],
-  credentials: true,
-});
-
+  app.enableCors({
+    origin: [
+      'https://makinfratech-fsm.onrender.com', // <--- ADD THIS EXACT LINE
+      'http://localhost:3001', 
+      'http://localhost:19006',
+      'https://abdulrahmanek18-lab.github.io', 
+      'https://abdulrahmanek18-lab.github.io/mak-infratech-fsm-frontend/',
+      'https://abdulrahmanek18-lab.github.io/ekfsm-backend/',
+    ],
+    credentials: true,
+  });
   // Validation
   app.useGlobalPipes(
     new ValidationPipe({
