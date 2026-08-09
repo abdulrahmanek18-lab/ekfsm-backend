@@ -6,7 +6,6 @@ export class CustomersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: any) {
-    // Find the first company in the database
     const company = await this.prisma.company.findFirst();
     
     if (!company) {
