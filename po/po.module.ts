@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import {POService} from './po.service';
-import {POController} from './po.controller';
+import { PoController } from './po.controller';
+import { PoService } from './po.service';
 
 @Module({
-  providers: [POService],
-  controllers: [POController],
-  exports: [POService],
+  controllers: [PoController],
+  providers: [PoService],
 })
 export class POModule {}
