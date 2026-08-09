@@ -14,25 +14,21 @@ export class InvoicesService {
     const vatAmount = subtotal * (vatRate / 100);
     const total = subtotal + vatAmount;
 
-    // --- NEW INVOICE NUMBER LOGIC (INV-YYYY-00001) ---
+    // --- INVOICE NUMBER LOGIC (INV-YYYY-00001) ---
     const year = new Date().getFullYear();
-    
-    // Count how many invoices already exist for this year
     const count = await this.prisma.invoice.count({
       where: { 
         invoiceNumber: { startsWith: `INV-${year}-` } 
       }
     });
-    
-    // Increment the count by 1 and pad it with zeros so it's 5 digits long (e.g., 00001)
     const sequence = String(count + 1).padStart(5, '0');
     const invoiceNumber = `INV-${year}-${sequence}`; 
-    // ---------------------------------------------------
+    // -----------------------------------------------
 
     // 1. Create the Invoice
     const invoice = await this.prisma.invoice.create({
       data: {
-        invoiceNumber: invoiceNumber, // Use the new formatted number
+        invoiceNumber: invoiceNumber,
         customerId: data.customerId,
         companyId: company.id,
         issueDate: new Date(),
@@ -63,17 +59,16 @@ export class InvoicesService {
   }
 
   async findAll() {
-    // This retrieves all invoices and includes the customer name so you can see it in the table!
     return this.prisma.invoice.findMany({
       include: { customer: true },
       orderBy: { createdAt: 'desc' },
     });
   }
-}
-  // Add this to the bottom of your InvoicesService class
+
   async findOne(id: string) {
     return this.prisma.invoice.findUnique({
       where: { id },
       include: { customer: true },
     });
   }
+}
