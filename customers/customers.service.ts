@@ -6,8 +6,7 @@ export class CustomersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: any) {
-    // Your Prisma schema requires a companyId. 
-    // We will grab the first company in the database to attach this customer to.
+    // Find the first company in the database
     const company = await this.prisma.company.findFirst();
     
     if (!company) {
@@ -17,9 +16,9 @@ export class CustomersService {
     return this.prisma.customer.create({
       data: {
         name: data.name,
-        email: data.email,
-        phone: data.phone,
-        address: data.address,
+        email: data.email || null,
+        phone: data.phone || null,
+        address: data.address || null,
         companyId: company.id, 
       },
     });
@@ -28,25 +27,6 @@ export class CustomersService {
   async findAll() {
     return this.prisma.customer.findMany({
       orderBy: { createdAt: 'desc' },
-    });
-  }
-
-  async findOne(id: string) {
-    return this.prisma.customer.findUnique({
-      where: { id },
-    });
-  }
-
-  async update(id: string, data: any) {
-    return this.prisma.customer.update({
-      where: { id },
-      data,
-    });
-  }
-
-  async remove(id: string) {
-    return this.prisma.customer.delete({
-      where: { id },
     });
   }
 }
