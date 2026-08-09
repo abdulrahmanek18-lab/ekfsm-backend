@@ -28,22 +28,27 @@ export class InvoicesService {
         total: total,
         balanceDue: total, 
         status: data.status || 'DRAFT',
-        notes: data.notes || null, // Save the description!
+        notes: data.notes || null,
       },
     });
 
     // 2. If this invoice is for an AMC EMI, link the EMI to this Invoice ID
     if (data.emiId) {
-      await this.prisma.eMISchedule.update({
-        where: { id: data.emiId },
-        data: { invoiceId: invoice.id },
-      });
+      try {
+        await this.prisma.eMISchedule.update({
+          where: { id: data.emiId },
+          data: { invoiceId: invoice.id },
+        });
+      } catch (e) {
+        console.error("Failed to link EMI, but invoice was saved.");
+      }
     }
 
     return invoice;
   }
 
   async findAll() {
+    // This retrieves all invoices and includes the customer name so you can see it in the table!
     return this.prisma.invoice.findMany({
       include: { customer: true },
       orderBy: { createdAt: 'desc' },
