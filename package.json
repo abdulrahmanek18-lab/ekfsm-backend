@@ -69,6 +69,7 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3",
     "uuid": "^9.0.1"
+    "qrcode": "^1.5.3"
   },
   "devDependencies": {
     "@nestjs/schematics": "^10.1.0",
@@ -81,6 +82,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^9.0.8",
+    "@types/qrcode": "^1.5.5"
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "eslint": "^8.56.0",
