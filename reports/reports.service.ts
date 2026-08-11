@@ -5,48 +5,98 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ReportsService {
   constructor(private prisma: PrismaService) {}
 
-  async getSummary() {
-    // 1. Total Invoiced Amount
-    const totalInvoices = await this.prisma.invoice.aggregate({
-      _sum: { total: true },
-      where: { isVoid: false },
-    });
+  async getDashboardKPIs(companyId: string) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // 2. Paid Invoices Amount
-    const paidInvoices = await this.prisma.invoice.aggregate({
-      _sum: { total: true },
-      where: { status: 'PAID', isVoid: false },
-    });
-
-    // 3. Pending Invoices Amount
-    const pendingInvoices = await this.prisma.invoice.aggregate({
-      _sum: { total: true },
-      where: { status: { in: ['SENT', 'DRAFT', 'PARTIAL', 'OVERDUE'] }, isVoid: false },
-    });
-
-    // 4. Total Expenses
-    const totalExpenses = await this.prisma.expense.aggregate({
-      _sum: { amount: true },
-      where: { status: 'APPROVED' },
-    });
-
-    // 5. Work Order Status Counts
-    const woStats = await this.prisma.workOrder.groupBy({
-      by: ['status'],
-      _count: { status: true },
-    });
+    const [
+      totalJobs,
+      pendingJobs,
+      inProgressJobs,
+      completedToday,
+      overdueJobs,
+      totalInvoices,
+      pendingInvoices,
+      totalRevenue,
+      lowStockItems,
+      upcomingPPM,
+    ] = await Promise.all([
+      this.prisma.workOrder.count({ where: { companyId } }),
+      this.prisma.workOrder.count({ where: { companyId, status: 'PENDING' } }),
+      this.prisma.workOrder.count({ where: { companyId, status: 'IN_PROGRESS' } }),
+      this.prisma.workOrder.count({ where: { companyId, status: 'COMPLETED', completedAt: { gte: today, lt: tomorrow } } }),
+      this.prisma.workOrder.count({ where: { companyId, status: { in: ['PENDING', 'ASSIGNED', 'IN_PROGRESS'] }, scheduledAt: { lt: today } } }),
+      this.prisma.invoice.count({ where: { companyId } }),
+      this.prisma.invoice.count({ where: { companyId, status: { in: ['DRAFT', 'SENT', 'PARTIAL', 'OVERDUE'] } } }),
+      this.prisma.invoice.aggregate({ where: { companyId, status: 'PAID' }, _sum: { totalAmount: true } }),
+      this.prisma.inventoryItem.count({ where: { companyId, quantity: { lte: { minStock: true } } } }),
+      this.prisma.pPMSchedule.count({ where: { amc: { companyId }, scheduledAt: { gte: today, lte: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000) }, status: 'SCHEDULED' } }),
+    ]);
 
     return {
-      revenue: {
-        total: totalInvoices._sum.total || 0,
-        paid: paidInvoices._sum.total || 0,
-        pending: pendingInvoices._sum.total || 0,
-      },
-      expenses: {
-        total: totalExpenses._sum.amount || 0,
-      },
-      netProfit: (paidInvoices._sum.total || 0) - (totalExpenses._sum.amount || 0),
-      workOrders: woStats,
+      jobs: { total: totalJobs, pending: pendingJobs, inProgress: inProgressJobs, completedToday, overdue: overdueJobs },
+      invoices: { total: totalInvoices, pending: pendingInvoices, totalRevenue: totalRevenue._sum.totalAmount || 0 },
+      inventory: { lowStock: lowStockItems },
+      amc: { upcomingPPM },
     };
+  }
+
+  async getJobReport(companyId: string, startDate: string, endDate: string) {
+    const jobs = await this.prisma.workOrder.findMany({
+      where: {
+        companyId,
+        createdAt: { gte: new Date(startDate), lte: new Date(endDate) },
+      },
+      include: {
+        category: true,
+        technician: { select: { name: true } },
+        flat: { include: { building: true } },
+      },
+    });
+
+    const byCategory = {};
+    const byTechnician = {};
+    const byStatus = {};
+
+    for (const job of jobs) {
+      const cat = job.category.name;
+      byCategory[cat] = (byCategory[cat] || 0) + 1;
+
+      const tech = job.technician?.name || 'Unassigned';
+      byTechnician[tech] = (byTechnician[tech] || 0) + 1;
+
+      byStatus[job.status] = (byStatus[job.status] || 0) + 1;
+    }
+
+    return { total: jobs.length, byCategory, byTechnician, byStatus, jobs };
+  }
+
+  async getTechnicianPerformance(companyId: string, startDate: string, endDate: string) {
+    const technicians = await this.prisma.user.findMany({
+      where: { companyId, role: 'TECHNICIAN' },
+      include: {
+        assignedWorkOrders: {
+          where: {
+            completedAt: { gte: new Date(startDate), lte: new Date(endDate) },
+          },
+        },
+      },
+    });
+
+    return technicians.map(t => ({
+      id: t.id,
+      name: t.name,
+      totalCompleted: t.assignedWorkOrders.length,
+      avgCompletionTime: t.assignedWorkOrders.length > 0
+        ? t.assignedWorkOrders.reduce((sum, wo) => {
+            if (wo.startedAt && wo.completedAt) {
+              return sum + (new Date(wo.completedAt).getTime() - new Date(wo.startedAt).getTime());
+            }
+            return sum;
+          }, 0) / t.assignedWorkOrders.length / (1000 * 60 * 60) // hours
+        : 0,
+    }));
   }
 }
