@@ -19,6 +19,9 @@ import { UploadModule } from './upload/upload.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AmcModule } from './amc/amc.module';
+import { QrModule } from './qr/qr.module';
+import { PdfModule } from './pdf/pdf.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -42,6 +45,9 @@ import { AmcModule } from './amc/amc.module';
     UploadModule,
     GatewayModule,
     AmcModule,
+    QrModule,
+    PdfModule,
+    SettingsModule,
   ],
 })
 export class AppModule {}
