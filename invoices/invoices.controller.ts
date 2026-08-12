@@ -4,7 +4,7 @@ import { InvoicesExtraService } from './invoices-extra.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('invoices')
-@Roles('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT', 'CLIENT') // Added CLIENT so they can view their own invoices
+@Roles('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT', 'CLIENT') 
 export class InvoicesController {
   constructor(
     private readonly invoicesService: InvoicesService,
@@ -18,12 +18,12 @@ export class InvoicesController {
 
   @Get()
   findAll(@Req() req: any) {
-    return this.invoicesService.findAll(req.user); // Pass user to service
+    return this.invoicesService.findAll(req.user);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: any) {
-    return this.invoicesService.findOne(id, req.user); // Pass user to service
+    return this.invoicesService.findOne(id, req.user);
   }
 
   @Patch(':id/status')
