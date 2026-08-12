@@ -38,6 +38,7 @@ model Company {
   assets      Asset[]
   workOrders  WorkOrder[]
   invoices    Invoice[]
+  staff       Staff[]
   amcs        AMC[]
   purchaseOrders PurchaseOrder[]
   expenses    Expense[]
