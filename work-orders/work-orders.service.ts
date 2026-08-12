@@ -128,3 +128,26 @@ export class WorkOrdersService {
     return { deleted: true };
   }
 }
+  async create(data: any) {
+    const company = await this.prisma.company.findFirst();
+    if (!company) throw new Error('No company exists in the database.');
+
+    const count = await this.prisma.workOrder.count();
+    const woNumber = `WO-${String(count + 1).padStart(4, '0')}`;
+
+    return this.prisma.workOrder.create({
+      data: {
+        woNumber,
+        title: data.title,
+        description: data.description || null,
+        priority: data.priority || 'MEDIUM',
+        status: 'PENDING',
+        customerId: data.customerId || null,
+        buildingId: data.buildingId || null,
+        flatId: data.flatId || null,
+        assetId: data.assetId || null,
+        scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
+        companyId: company.id,
+      },
+    });
+  }
