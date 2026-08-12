@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class WorkOrdersService {
   constructor(private prisma: PrismaService) {}
 
-   async create(data: any) {
+  async create(data: any) {
     try {
       const company = await this.prisma.company.findFirst();
       if (!company) throw new Error('No company exists in the database.');
@@ -23,14 +23,25 @@ export class WorkOrdersService {
           description: clean(data.description),
           priority: data.priority || 'MEDIUM',
           status: 'PENDING',
-          companyId: company.id,
-          // Explicitly clean these so we don't pass "" to Prisma
-          customerId: clean(data.customerId), 
-          buildingId: clean(data.buildingId),
-          flatId: clean(data.flatId),
-          assetId: clean(data.assetId),
+          
+          // Explicitly connect the company
+          company: { 
+            connect: { id: company.id } 
+          },
+          
+          // Connect other relations if they exist
+          customer: clean(data.customerId) ? { connect: { id: clean(data.customerId) } } : undefined,
+          building: clean(data.buildingId) ? { connect: { id: clean(data.buildingId) } } : undefined,
+          flat: clean(data.flatId) ? { connect: { id: clean(data.flatId) } } : undefined,
+          asset: clean(data.assetId) ? { connect: { id: clean(data.assetId) } } : undefined,
+          
           scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
         },
+        include: {
+          customer: true,
+          building: true,
+          asset: true
+        }
       });
     } catch (error) {
       console.error('Error creating Work Order:', error);
