@@ -54,22 +54,30 @@ export class WorkOrdersService {
     return wo;
   }
 
-  async update(id: string, companyId: string, dto: any) {
-    const wo = await this.prisma.workOrder.findFirst({ where: { id, companyId } });
-    if (!wo) throw new NotFoundException('Work order not found');
+    async update(id: string, data: any) {
+    // Generate a Service Report Number if it doesn't exist yet
+    let serviceReportNumber = data.serviceReportNumber;
+    if (!serviceReportNumber) {
+      const count = await this.prisma.workOrder.count({ where: { serviceReportNumber: { not: null } } });
+      serviceReportNumber = `SR-${String(count + 1).padStart(4, '0')}`;
+    }
 
     return this.prisma.workOrder.update({
       where: { id },
       data: {
-        ...dto,
-        scheduledDate: dto.scheduledDate ? new Date(dto.scheduledDate) : undefined,
-        startedAt: dto.startedAt ? new Date(dto.startedAt) : undefined,
-        completedAt: dto.completedAt ? new Date(dto.completedAt) : undefined,
+        status: 'COMPLETED',
+        workPerformed: data.workPerformed || null,
+        observations: data.observations || null,
+        materialsUsed: data.materialsUsed || null,
+        clientSignature: data.clientSignature || null,
+        technicianName: data.technicianName || 'Technician',
+        serviceReportNumber: serviceReportNumber,
+        // Save the Start and End times!
+        startedAt: data.startedAt ? new Date(data.startedAt) : null,
+        completedAt: data.completedAt ? new Date(data.completedAt) : new Date(),
       },
-      include: { customer: true, building: true, flat: true, asset: true, serviceCategory: true, technician: true },
     });
   }
-
   async startWork(id: string, companyId: string, technicianId: string) {
     return this.prisma.workOrder.update({
       where: { id },
