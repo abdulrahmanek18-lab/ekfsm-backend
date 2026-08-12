@@ -7,32 +7,24 @@ export class WorkOrdersService {
 
   async create(data: any) {
     try {
-      // 1. Find the company
       const company = await this.prisma.company.findFirst();
-      
-      // 2. If no company exists, throw a clear error
-      if (!company) {
-        throw new Error('No company exists in the database. Please create a company first.');
-      }
+      if (!company) throw new Error('No company exists in the database.');
 
       const count = await this.prisma.workOrder.count();
       const woNumber = `WO-${String(count + 1).padStart(4, '0')}`;
 
-      // Helper function: if the value is empty string, return null
-      const clean = (val) => (val === "" || val === undefined) ? null : val;
+      const clean = (val: any) => (val === "" || val === undefined) ? null : val;
 
-      // 3. Build the data object safely
       const createData: any = {
         woNumber,
         title: data.title,
         description: clean(data.description),
         priority: data.priority || 'MEDIUM',
         status: 'PENDING',
-        companyId: company.id, // Directly assign the ID
+        companyId: company.id, 
         scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
       };
 
-      // Only add these if they have a valid value
       if (clean(data.customerId)) createData.customerId = clean(data.customerId);
       if (clean(data.buildingId)) createData.buildingId = clean(data.buildingId);
       if (clean(data.flatId)) createData.flatId = clean(data.flatId);
@@ -40,14 +32,10 @@ export class WorkOrdersService {
 
       return await this.prisma.workOrder.create({
         data: createData,
-        include: {
-          customer: true,
-          building: true,
-          asset: true
-        }
+        include: { customer: true, building: true, asset: true }
       });
     } catch (error) {
-      console.error('Error creating Work Order:', error.message);
+      console.error('Error creating Work Order:', error);
       throw new Error(error.message || 'Failed to create Work Order');
     }
   }
@@ -66,27 +54,12 @@ export class WorkOrdersService {
     });
   }
 
-    async update(id: string, data: any) {
+  // Removed the missing fields so Prisma doesn't crash
+  async update(id: string, data: any) {
     return this.prisma.workOrder.update({
       where: { id },
       data: {
         status: 'COMPLETED',
-        startedAt: data.startedAt ? new Date(data.startedAt) : null,
-        completedAt: data.completedAt ? new Date(data.completedAt) : new Date(),
-      },
-    });
-  }
-
-    return this.prisma.workOrder.update({
-      where: { id },
-      data: {
-        status: 'COMPLETED',
-        workPerformed: data.workPerformed || null,
-        observations: data.observations || null,
-        materialsUsed: data.materialsUsed || null,
-        clientSignature: data.clientSignature || null,
-        technicianName: data.technicianName || 'Technician',
-        serviceReportNumber: serviceReportNumber,
         startedAt: data.startedAt ? new Date(data.startedAt) : null,
         completedAt: data.completedAt ? new Date(data.completedAt) : new Date(),
       },
