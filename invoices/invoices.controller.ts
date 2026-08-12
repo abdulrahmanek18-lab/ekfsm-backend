@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Patch, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Req } from '@nestjs/common';
 import { InvoicesService } from './invoices.service';
 import { InvoicesExtraService } from './invoices-extra.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('invoices')
-@Roles('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT') // <--- ADD THIS
+@Roles('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT', 'CLIENT') // Added CLIENT so they can view their own invoices
 export class InvoicesController {
   constructor(
     private readonly invoicesService: InvoicesService,
@@ -17,13 +17,13 @@ export class InvoicesController {
   }
 
   @Get()
-  findAll() {
-    return this.invoicesService.findAll();
+  findAll(@Req() req: any) {
+    return this.invoicesService.findAll(req.user); // Pass user to service
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.invoicesService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req: any) {
+    return this.invoicesService.findOne(id, req.user); // Pass user to service
   }
 
   @Patch(':id/status')
