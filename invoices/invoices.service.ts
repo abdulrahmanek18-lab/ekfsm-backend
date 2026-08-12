@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -58,17 +58,32 @@ export class InvoicesService {
     return invoice;
   }
 
-  async findAll() {
+  // --- RBAC RESOURCE SCOPING ---
+  async findAll(user: any) {
+    // If the user is a CLIENT, only fetch invoices where customerId matches their ID.
+    // Admins/Managers/Accountants will see all invoices.
+    const where = user.role === 'CLIENT' ? { customerId: user.customerId } : {};
+    
     return this.prisma.invoice.findMany({
+      where,
       include: { customer: true },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async findOne(id: string) {
-    return this.prisma.invoice.findUnique({
+  async findOne(id: string, user: any) {
+    const invoice = await this.prisma.invoice.findUnique({
       where: { id },
       include: { customer: true },
     });
+
+    if (!invoice) return null;
+
+    // If the user is a CLIENT and this invoice doesn't belong to them, block access.
+    if (user.role === 'CLIENT' && invoice.customerId !== user.customerId) {
+      throw new ForbiddenException('You do not have access to this invoice.');
+    }
+
+    return invoice;
   }
 }
