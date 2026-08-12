@@ -25,7 +25,6 @@ export class InvoicesService {
     const invoiceNumber = `INV-${year}-${sequence}`; 
     // -----------------------------------------------
 
-    // 1. Create the Invoice
     const invoice = await this.prisma.invoice.create({
       data: {
         invoiceNumber: invoiceNumber,
@@ -43,7 +42,6 @@ export class InvoicesService {
       },
     });
 
-    // 2. If this invoice is for an AMC EMI, link the EMI to this Invoice ID
     if (data.emiId) {
       try {
         await this.prisma.eMISchedule.update({
@@ -60,9 +58,7 @@ export class InvoicesService {
 
   // --- RBAC RESOURCE SCOPING ---
   async findAll(user: any) {
-    // If the user is a CLIENT, only fetch invoices where customerId matches their ID.
-    // Admins/Managers/Accountants will see all invoices.
-    const where = user.role === 'CLIENT' ? { customerId: user.customerId } : {};
+    const where = user && user.role === 'CLIENT' ? { customerId: user.customerId } : {};
     
     return this.prisma.invoice.findMany({
       where,
@@ -79,8 +75,7 @@ export class InvoicesService {
 
     if (!invoice) return null;
 
-    // If the user is a CLIENT and this invoice doesn't belong to them, block access.
-    if (user.role === 'CLIENT' && invoice.customerId !== user.customerId) {
+    if (user && user.role === 'CLIENT' && invoice.customerId !== user.customerId) {
       throw new ForbiddenException('You do not have access to this invoice.');
     }
 
