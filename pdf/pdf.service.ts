@@ -5,7 +5,7 @@ import { PDFDocument } from 'pdf-lib';
 @Injectable()
 export class PdfService {
   async generateFromHtml(html: string, options?: { width?: string; height?: string }) {
-    const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
     const pdf = await page.pdf({
