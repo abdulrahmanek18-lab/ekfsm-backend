@@ -22,6 +22,7 @@ import { AmcModule } from './amc/amc.module';
 import { QrModule } from './qr/qr.module';
 import { PdfModule } from './pdf/pdf.module';
 import { SettingsModule } from './settings/settings.module';
+import { StaffModule } from './staff/staff.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { SettingsModule } from './settings/settings.module';
     QrModule,
     PdfModule,
     SettingsModule,
+    StaffModule,
   ],
 })
 export class AppModule {}
