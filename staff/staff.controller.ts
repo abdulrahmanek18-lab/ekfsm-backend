@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { StaffService } from './staff.service';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('staff')
+@Roles('SUPER_ADMIN', 'ADMIN', 'MANAGER')
 export class StaffController {
   constructor(private readonly service: StaffService) {}
 
