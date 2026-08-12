@@ -3,7 +3,6 @@ import { Response } from 'express';
 import { PdfService } from './pdf.service';
 
 @Controller('pdf')
-// Removed @UseGuards(JwtAuthGuard) so the server can start without crashing
 export class PdfController {
   constructor(private readonly service: PdfService) {}
 
