@@ -644,3 +644,27 @@ model FcmToken {
   @@unique([userId, token])
   @@index([userId])
 }
+model Staff {
+  id                    String    @id @default(uuid())
+  companyId             String
+  firstName             String
+  lastName              String
+  photoUrl              String?
+  jobTitle              String?
+  nationality           String?
+  phone                 String?
+  passportNumber        String?
+  passportExpiry        DateTime?
+  emiratesId            String?
+  emiratesIdExpiry      DateTime?
+  visaNumber            String?
+  visaExpiry            DateTime?
+  insuranceProvider     String?
+  insurancePolicyNumber String?
+  insuranceExpiry       DateTime?
+  createdAt             DateTime  @default(now())
+
+  company               Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
