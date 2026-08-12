@@ -1,17 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-
-@Injectable()
-export class WorkOrdersService {
-  constructor(private prisma: PrismaService) {}
-
   async create(data: any) {
     try {
       const company = await this.prisma.company.findFirst();
-      if (!company) throw new Error('No company exists in the database.');
+      if (!company) {
+        throw new Error('No company exists in the database. Please add a company in Supabase.');
+      }
 
       const count = await this.prisma.workOrder.count();
-      const woNumber = `WO-${String(count + 1).padStart(4, '0')}`;
+      const woNumber = `WO-${String(count + 1).padStart(5, '0')}`; // Changed to 5 zeros
 
       const clean = (val: any) => (val === "" || val === undefined) ? null : val;
 
@@ -21,14 +16,17 @@ export class WorkOrdersService {
         description: clean(data.description),
         priority: data.priority || 'MEDIUM',
         status: 'PENDING',
-        companyId: company.id, 
         scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
+        // Use the connect syntax for the company relation
+        company: { 
+          connect: { id: company.id } 
+        },
       };
 
-      if (clean(data.customerId)) createData.customerId = clean(data.customerId);
-      if (clean(data.buildingId)) createData.buildingId = clean(data.buildingId);
-      if (clean(data.flatId)) createData.flatId = clean(data.flatId);
-      if (clean(data.assetId)) createData.assetId = clean(data.assetId);
+      if (clean(data.customerId)) createData.customer = { connect: { id: clean(data.customerId) } };
+      if (clean(data.buildingId)) createData.building = { connect: { id: clean(data.buildingId) } };
+      if (clean(data.flatId)) createData.flat = { connect: { id: clean(data.flatId) } };
+      if (clean(data.assetId)) createData.asset = { connect: { id: clean(data.assetId) } };
 
       return await this.prisma.workOrder.create({
         data: createData,
@@ -39,30 +37,3 @@ export class WorkOrdersService {
       throw new Error(error.message || 'Failed to create Work Order');
     }
   }
-
-  async findAll() {
-    return this.prisma.workOrder.findMany({
-      include: { customer: true, building: true, asset: true },
-      orderBy: { createdAt: 'desc' },
-    });
-  }
-
-  async findOne(id: string) {
-    return this.prisma.workOrder.findUnique({
-      where: { id },
-      include: { customer: true, building: true, asset: true },
-    });
-  }
-
-  // Removed the missing fields so Prisma doesn't crash
-  async update(id: string, data: any) {
-    return this.prisma.workOrder.update({
-      where: { id },
-      data: {
-        status: 'COMPLETED',
-        startedAt: data.startedAt ? new Date(data.startedAt) : null,
-        completedAt: data.completedAt ? new Date(data.completedAt) : new Date(),
-      },
-    });
-  }
-}
