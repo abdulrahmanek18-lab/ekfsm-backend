@@ -66,12 +66,16 @@ export class WorkOrdersService {
     });
   }
 
-  async update(id: string, data: any) {
-    let serviceReportNumber = data.serviceReportNumber;
-    if (!serviceReportNumber) {
-      const count = await this.prisma.workOrder.count({ where: { serviceReportNumber: { not: null } } });
-      serviceReportNumber = `SR-${String(count + 1).padStart(4, '0')}`;
-    }
+    async update(id: string, data: any) {
+    return this.prisma.workOrder.update({
+      where: { id },
+      data: {
+        status: 'COMPLETED',
+        startedAt: data.startedAt ? new Date(data.startedAt) : null,
+        completedAt: data.completedAt ? new Date(data.completedAt) : new Date(),
+      },
+    });
+  }
 
     return this.prisma.workOrder.update({
       where: { id },
