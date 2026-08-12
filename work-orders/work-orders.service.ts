@@ -7,8 +7,13 @@ export class WorkOrdersService {
 
   async create(data: any) {
     try {
+      // 1. Find the company
       const company = await this.prisma.company.findFirst();
-      if (!company) throw new Error('No company exists in the database.');
+      
+      // 2. If no company exists, throw a clear error
+      if (!company) {
+        throw new Error('No company exists in the database. Please create a company first.');
+      }
 
       const count = await this.prisma.workOrder.count();
       const woNumber = `WO-${String(count + 1).padStart(4, '0')}`;
@@ -16,27 +21,25 @@ export class WorkOrdersService {
       // Helper function: if the value is empty string, return null
       const clean = (val) => (val === "" || val === undefined) ? null : val;
 
+      // 3. Build the data object safely
+      const createData: any = {
+        woNumber,
+        title: data.title,
+        description: clean(data.description),
+        priority: data.priority || 'MEDIUM',
+        status: 'PENDING',
+        companyId: company.id, // Directly assign the ID
+        scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
+      };
+
+      // Only add these if they have a valid value
+      if (clean(data.customerId)) createData.customerId = clean(data.customerId);
+      if (clean(data.buildingId)) createData.buildingId = clean(data.buildingId);
+      if (clean(data.flatId)) createData.flatId = clean(data.flatId);
+      if (clean(data.assetId)) createData.assetId = clean(data.assetId);
+
       return await this.prisma.workOrder.create({
-        data: {
-          woNumber,
-          title: data.title,
-          description: clean(data.description),
-          priority: data.priority || 'MEDIUM',
-          status: 'PENDING',
-          
-          // Explicitly connect the company
-          company: { 
-            connect: { id: company.id } 
-          },
-          
-          // Connect other relations if they exist
-          customer: clean(data.customerId) ? { connect: { id: clean(data.customerId) } } : undefined,
-          building: clean(data.buildingId) ? { connect: { id: clean(data.buildingId) } } : undefined,
-          flat: clean(data.flatId) ? { connect: { id: clean(data.flatId) } } : undefined,
-          asset: clean(data.assetId) ? { connect: { id: clean(data.assetId) } } : undefined,
-          
-          scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
-        },
+        data: createData,
         include: {
           customer: true,
           building: true,
@@ -44,7 +47,7 @@ export class WorkOrdersService {
         }
       });
     } catch (error) {
-      console.error('Error creating Work Order:', error);
+      console.error('Error creating Work Order:', error.message);
       throw new Error(error.message || 'Failed to create Work Order');
     }
   }
