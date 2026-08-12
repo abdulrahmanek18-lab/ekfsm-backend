@@ -1,33 +1,34 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('users')
+@Roles('SUPER_ADMIN', 'ADMIN') // <--- ADD THIS: Only Admins can manage users
 export class UsersController {
-  constructor(private readonly service: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() data: any) {
-    return this.service.create(data);
+  create(@Body() body: any) {
+    return this.usersService.create(body);
   }
 
   @Get()
   findAll() {
-    return this.service.findAll();
+    return this.usersService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.service.findOne(id);
+    return this.usersService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: any) {
-    return this.service.update(id, data);
+  update(@Param('id') id: string, @Body() body: any) {
+    return this.usersService.update(id, body);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.service.remove(id);
+    return this.usersService.remove(id);
   }
 }
