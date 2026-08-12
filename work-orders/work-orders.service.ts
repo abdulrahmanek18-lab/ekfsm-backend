@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class WorkOrdersService {
   constructor(private prisma: PrismaService) {}
 
-    async create(data: any) {
+   async create(data: any) {
     try {
       const company = await this.prisma.company.findFirst();
       if (!company) throw new Error('No company exists in the database.');
@@ -13,23 +13,23 @@ export class WorkOrdersService {
       const count = await this.prisma.workOrder.count();
       const woNumber = `WO-${String(count + 1).padStart(4, '0')}`;
 
+      // Helper function: if the value is empty string, return null
+      const clean = (val) => (val === "" || val === undefined) ? null : val;
+
       return await this.prisma.workOrder.create({
         data: {
           woNumber,
           title: data.title,
-          description: data.description || null,
+          description: clean(data.description),
           priority: data.priority || 'MEDIUM',
           status: 'PENDING',
-          // Use null if empty string is passed
-          customerId: data.customerId || null, 
-          buildingId: data.buildingId || null,
-          flatId: data.flatId || null,
-          assetId: data.assetId || null,
+          companyId: company.id,
+          // Explicitly clean these so we don't pass "" to Prisma
+          customerId: clean(data.customerId), 
+          buildingId: clean(data.buildingId),
+          flatId: clean(data.flatId),
+          assetId: clean(data.assetId),
           scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
-          // Use the connect syntax for the company relation
-          company: { 
-            connect: { id: company.id } 
-          },
         },
       });
     } catch (error) {
