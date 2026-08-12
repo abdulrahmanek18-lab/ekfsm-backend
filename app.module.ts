@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+
+// Modules
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CompanyModule } from './company/company.module';
@@ -23,6 +26,10 @@ import { QrModule } from './qr/qr.module';
 import { PdfModule } from './pdf/pdf.module';
 import { SettingsModule } from './settings/settings.module';
 import { StaffModule } from './staff/staff.module';
+
+// Guards
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { RolesGuard } from './auth/roles.guard';
 
 @Module({
   imports: [
@@ -50,6 +57,16 @@ import { StaffModule } from './staff/staff.module';
     PdfModule,
     SettingsModule,
     StaffModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard, // 1. Ensures every route requires login (unless @Public())
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard, // 2. Ensures every route requires specific roles (Deny by Default)
+    },
   ],
 })
 export class AppModule {}
