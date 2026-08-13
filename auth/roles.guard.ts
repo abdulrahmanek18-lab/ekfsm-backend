@@ -20,15 +20,20 @@ export class RolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    // DENY BY DEFAULT: If no roles are specified, block access
+    const { user } = context.switchToHttp().getRequest();
+
+    // ENTERPRISE RULE: Super Admin bypasses all role checks
+    if (user && user.role === 'SUPER_ADMIN') {
+      return true;
+    }
+
+    // DENY BY DEFAULT: If no roles are specified, block access for non-super-admins
     if (!requiredRoles) {
       throw new ForbiddenException('Access denied: Insufficient permissions.');
     }
 
-    const { user } = context.switchToHttp().getRequest();
-
     // If user doesn't have a role, or their role is not in the allowed list, deny
-    if (!user || !requiredRoles.some((role) => user.role?.includes(role))) {
+    if (!user || !requiredRoles.includes(user.role)) {
       throw new ForbiddenException('Access denied: You do not have permission to perform this action.');
     }
 
