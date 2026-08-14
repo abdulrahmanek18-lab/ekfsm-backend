@@ -26,6 +26,7 @@ import { QrModule } from './qr/qr.module';
 import { PdfModule } from './pdf/pdf.module';
 import { SettingsModule } from './settings/settings.module';
 import { StaffModule } from './staff/staff.module';
+import { PurchasesModule } from './purchases/purchases.module'; // <-- NEW IMPORT
 
 // Guards
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
@@ -57,6 +58,7 @@ import { RolesGuard } from './auth/roles.guard';
     PdfModule,
     SettingsModule,
     StaffModule,
+    PurchasesModule, // <-- ADDED TO IMPORTS ARRAY
   ],
   providers: [
     {
