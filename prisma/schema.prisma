@@ -38,13 +38,14 @@ model Company {
   assets      Asset[]
   workOrders  WorkOrder[]
   invoices    Invoice[]
-  staff       Staff[]
   amcs        AMC[]
   purchaseOrders PurchaseOrder[]
   expenses    Expense[]
   items       InventoryItem[]
   stockAdjustments StockAdjustment[]
   notifications Notification[]
+  staff       Staff[]
+  purchases   Purchase[]
 }
 
 model User {
@@ -325,7 +326,15 @@ model WorkOrder {
   actualCost        Float?
   customerNotes     String?
   technicianNotes   String?
-  itemsUsed         ItemUsed[]
+  
+  // Service Report Fields
+  serviceReportNumber String?
+  workPerformed       String?
+  observations        String?
+  materialsUsed       Json?
+  clientSignature     String?
+  technicianName      String?
+
   isActive          Boolean       @default(true)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
@@ -645,27 +654,55 @@ model FcmToken {
   @@unique([userId, token])
   @@index([userId])
 }
+
+// ── Staff (HR Module) ──
+
 model Staff {
-  id                    String    @id @default(uuid())
-  companyId             String
-  firstName             String
-  lastName              String
-  photoUrl              String?
-  jobTitle              String?
-  nationality           String?
-  phone                 String?
-  passportNumber        String?
-  passportExpiry        DateTime?
-  emiratesId            String?
-  emiratesIdExpiry      DateTime?
-  visaNumber            String?
-  visaExpiry            DateTime?
+  id               String    @id @default(uuid())
+  companyId        String
+  firstName        String
+  lastName         String
+  photoUrl         String?
+  jobTitle         String?
+  nationality      String?
+  phone            String?
+  passportNumber   String?
+  passportExpiry   DateTime?
+  emiratesId       String?
+  emiratesIdExpiry DateTime?
+  visaNumber       String?
+  visaExpiry       DateTime?
   insuranceProvider     String?
   insurancePolicyNumber String?
   insuranceExpiry       DateTime?
-  createdAt             DateTime  @default(now())
+  createdAt        DateTime  @default(now())
 
-  company               Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company          Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+// ── Purchases (Bills / Direct Purchases) ──
+
+model Purchase {
+  id            String    @id @default(uuid())
+  companyId     String
+  supplierName  String?
+  billNumber    String?
+  purchaseDate  DateTime?
+  dueDate       DateTime?
+  workOrderId   String?
+  assetId       String?
+  items         Json?
+  subtotal      Float?
+  vatAmount     Float?
+  totalAmount   Float?
+  paymentStatus String?
+  paymentMethod String?
+  receiptUrl    String?
+  createdAt     DateTime  @default(now())
+
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@index([companyId])
 }
