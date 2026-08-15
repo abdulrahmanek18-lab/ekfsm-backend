@@ -10,7 +10,6 @@ export class UsersService {
     const company = await this.prisma.company.findFirst();
     if (!company) throw new Error('No company exists in the database.');
 
-    // Hash the password before saving
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt);
 
@@ -20,7 +19,7 @@ export class UsersService {
         email: data.email,
         password: hashedPassword,
         role: data.role || 'TECHNICIAN',
-        companyId: company.id, // FIX: Link user to company
+        companyId: company.id,
       },
     });
   }
@@ -46,6 +45,31 @@ export class UsersService {
         email: true,
         role: true,
       },
+    });
+  }
+
+  // NEW: Added update method
+  async update(id: string, data: any) {
+    if (data.password) {
+      const salt = await bcrypt.genSalt(10);
+      data.password = await bcrypt.hash(data.password, salt);
+    }
+    
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        name: data.name || undefined,
+        email: data.email || undefined,
+        role: data.role || undefined,
+        password: data.password || undefined,
+      },
+    });
+  }
+
+  // NEW: Added remove method
+  async remove(id: string) {
+    return this.prisma.user.delete({
+      where: { id },
     });
   }
 }
