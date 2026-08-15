@@ -26,12 +26,7 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-      },
+      select: { id: true, name: true, email: true, role: true },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -39,16 +34,10 @@ export class UsersService {
   async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-      },
+      select: { id: true, name: true, email: true, role: true },
     });
   }
 
-  // NEW: Added update method
   async update(id: string, data: any) {
     if (data.password) {
       const salt = await bcrypt.genSalt(10);
@@ -66,7 +55,6 @@ export class UsersService {
     });
   }
 
-  // NEW: Added remove method
   async remove(id: string) {
     return this.prisma.user.delete({
       where: { id },
