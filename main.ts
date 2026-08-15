@@ -13,7 +13,7 @@ async function bootstrap() {
       'http://localhost:3001', 
       'http://localhost:19006',
       'https://abdulrahmanek18-lab.github.io',
-      'https://abdulrahmanek18-lab.github.io/mak-infratech-fsm-frontend/',
+      'https://abdulrahmanek18-lab.github.io/mak-infratech-fms-frontend/',
       'https://makinfratech-fsm.onrender.com'
     ],
     credentials: true,
