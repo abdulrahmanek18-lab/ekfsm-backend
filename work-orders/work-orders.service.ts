@@ -6,61 +6,45 @@ export class WorkOrdersService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: any) {
-    // The exact Company ID you confirmed exists in Supabase
-    const COMPANY_ID = '00000000-0000-0000-0000-000000000001';
-
-    const count = await this.prisma.workOrder.count();
-    const woNumber = `WO-${String(count + 1).padStart(5, '0')}`;
-
-    // We build the payload using Prisma's strict 'connect' syntax
-    const createData: any = {
-      woNumber,
-      title: data.title,
-      description: data.description || null,
-      priority: data.priority || 'MEDIUM',
-      status: 'PENDING',
-      scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
-      
-      // 1. Connect the Company (This fixes the missing argument error)
-      company: {
-        connect: { id: COMPANY_ID }
-      }
-    };
-
-    // 2. Connect Customer only if a valid ID was selected
-    if (data.customerId && data.customerId !== "") {
-      createData.customer = { connect: { id: data.customerId } };
-    }
-
-    // 3. Connect Building only if a valid ID was selected
-    if (data.buildingId && data.buildingId !== "") {
-      createData.building = { connect: { id: data.buildingId } };
-    }
-
-    // 4. Connect Flat only if a valid ID was selected
-    if (data.flatId && data.flatId !== "") {
-      createData.flat = { connect: { id: data.flatId } };
-    }
-
-    // 5. Connect Asset only if a valid ID was selected
-    if (data.assetId && data.assetId !== "") {
-      createData.asset = { connect: { id: data.assetId } };
-    }
-
     try {
+      const company = await this.prisma.company.findFirst();
+      if (!company) throw new Error('No company exists in the database.');
+
+      const count = await this.prisma.workOrder.count();
+      const woNumber = `WO-${String(count + 1).padStart(4, '0')}`;
+
+      const clean = (val: any) => (val === "" || val === undefined) ? null : val;
+
       return await this.prisma.workOrder.create({
-        data: createData,
-        include: { customer: true, building: true, asset: true }
+        data: {
+          woNumber,
+          title: data.title,
+          description: clean(data.description),
+          priority: data.priority || 'MEDIUM',
+          status: 'PENDING',
+          scheduledDate: data.scheduledDate ? new Date(data.scheduledDate) : null,
+          companyId: company.id,
+          customerId: clean(data.customerId) || undefined,
+          buildingId: clean(data.buildingId) || undefined,
+          flatId: clean(data.flatId) || undefined,
+          technicianId: clean(data.technicianId) || undefined,
+        },
       });
     } catch (error) {
-      console.error('PRISMA ERROR CREATING WORK ORDER:', error);
-      throw new Error(error.message);
+      console.error('Error creating Work Order:', error);
+      throw new Error(error.message || 'Failed to create Work Order');
     }
   }
 
   async findAll() {
+    // Include technician to show their name in the table
     return this.prisma.workOrder.findMany({
-      include: { customer: true, building: true, asset: true },
+      include: { 
+        customer: true, 
+        building: true, 
+        flat: true,
+        technician: true 
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -68,7 +52,15 @@ export class WorkOrdersService {
   async findOne(id: string) {
     return this.prisma.workOrder.findUnique({
       where: { id },
-      include: { customer: true, building: true, asset: true },
+      include: { customer: true, building: true, flat: true, technician: true },
+    });
+  }
+
+  // NEW: Inline status update
+  async updateStatus(id: string, status: string) {
+    return this.prisma.workOrder.update({
+      where: { id },
+      data: { status },
     });
   }
 
@@ -76,9 +68,9 @@ export class WorkOrdersService {
     return this.prisma.workOrder.update({
       where: { id },
       data: {
-        status: 'COMPLETED',
-        startedAt: data.startedAt ? new Date(data.startedAt) : null,
-        completedAt: data.completedAt ? new Date(data.completedAt) : new Date(),
+        status: data.status || undefined,
+        startedAt: data.startedAt ? new Date(data.startedAt) : undefined,
+        completedAt: data.completedAt ? new Date(data.completedAt) : undefined,
       },
     });
   }
