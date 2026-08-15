@@ -83,6 +83,49 @@ enum UserRole {
   VIEWER
 }
 
+// ── Finance Vouchers (Receipts & Payments) ──
+
+model ReceiptVoucher {
+  id            String    @id @default(uuid())
+  companyId     String
+  voucherNumber String?
+  date          DateTime?
+  customerId    String?
+  invoiceId     String?
+  amount        Float?
+  paymentMode   String?
+  chequeNumber  String?
+  bankName      String?
+  chequeDate    DateTime?
+  chequeStatus  String?
+  description   String?
+  createdAt     DateTime  @default(now())
+
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model PaymentVoucher {
+  id            String    @id @default(uuid())
+  companyId     String
+  voucherNumber String?
+  date          DateTime?
+  payeeName     String?
+  purchaseId    String?
+  amount        Float?
+  paymentMode   String?
+  chequeNumber  String?
+  bankName      String?
+  chequeDate    DateTime?
+  chequeStatus  String?
+  description   String?
+  createdAt     DateTime  @default(now())
+
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
 // ── Services ──
 
 model ServiceCategory {
