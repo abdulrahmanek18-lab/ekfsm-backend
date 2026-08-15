@@ -1,6 +1,3 @@
-// Render cache fix
-import { NestFactory } from '@nestjs/core';
-// ... rest of your code
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -9,21 +6,19 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Global prefix
   app.setGlobalPrefix('api');
 
   app.enableCors({
     origin: [
-      'https://makinfratech-fsm.onrender.com', // <--- ADD THIS EXACT LINE
       'http://localhost:3001', 
       'http://localhost:19006',
-      'https://abdulrahmanek18-lab.github.io', 
+      'https://abdulrahmanek18-lab.github.io',
       'https://abdulrahmanek18-lab.github.io/mak-infratech-fsm-frontend/',
-      'https://abdulrahmanek18-lab.github.io/ekfsm-backend/',
+      'https://makinfratech-fsm.onrender.com'
     ],
     credentials: true,
   });
-  // Validation
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -32,7 +27,6 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger
   const config = new DocumentBuilder()
     .setTitle('ekFSM API')
     .setDescription('Facilities Management ERP')
