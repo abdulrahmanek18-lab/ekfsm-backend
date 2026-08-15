@@ -17,13 +17,14 @@ export class AssetsController {
     return this.service.findAll();
   }
 
-  @Get(':assetNumber/history')
-  getHistory(@Param('assetNumber') assetNumber: string) {
-    return this.service.getHistory(assetNumber);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.service.findOne(id);
   }
 
-  @Post(':assetNumber/history')
-  addHistory(@Param('assetNumber') assetNumber: string, @Body() body: any) {
-    return this.service.addHistory(assetNumber, body);
+  // NEW: Route for QR Scanner
+  @Get('scan/:assetNumber')
+  findByAssetNumber(@Param('assetNumber') assetNumber: string) {
+    return this.service.findByAssetNumber(assetNumber);
   }
 }
