@@ -34,6 +34,8 @@ model Company {
 
   users       User[]
   customers   Customer[]
+  receiptVouchers   ReceiptVoucher[]
+  paymentVouchers   PaymentVoucher[]  
   buildings   Building[]
   assets      Asset[]
   workOrders  WorkOrder[]
