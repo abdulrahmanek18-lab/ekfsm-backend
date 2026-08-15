@@ -11,12 +11,15 @@ export class AuthService {
   ) {}
 
   async login(email: string, password: string) {
+    // 1. Find the user by email
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
+    // 2. Check if the password is correct
     const passwordValid = await bcrypt.compare(password, user.password);
     if (!passwordValid) throw new UnauthorizedException('Invalid credentials');
 
+    // 3. Create the JWT payload (must include role and companyId!)
     const payload = { 
       sub: user.id, 
       email: user.email, 
@@ -24,6 +27,7 @@ export class AuthService {
       companyId: user.companyId 
     };
     
+    // 4. Return the token and user object
     return {
       access_token: this.jwtService.sign(payload),
       user: {
