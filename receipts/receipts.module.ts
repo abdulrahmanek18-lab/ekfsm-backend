@@ -3,7 +3,7 @@ import { ReceiptsController } from './receipts.controller';
 import { ReceiptsService } from './receipts.service';
 
 @Module({
-  controllers: [ReceiptsController], // <-- The controller goes inside the brackets!
+  controllers: [ReceiptsController], // MUST BE HERE
   providers: [ReceiptsService],
 })
 export class ReceiptsModule {}
