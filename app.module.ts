@@ -27,8 +27,8 @@ import { PdfModule } from './pdf/pdf.module';
 import { SettingsModule } from './settings/settings.module';
 import { StaffModule } from './staff/staff.module';
 import { PurchasesModule } from './purchases/purchases.module';
-import { ReceiptsModule } from './receipts/receipts.module'; // <-- NEW IMPORT
-import { PaymentsModule } from './payments/payments.module'; // <-- NEW IMPORT
+import { ReceiptsModule } from './receipts/receipts.module';
+import { PaymentsModule } from './payments/payments.module';
 
 // Guards
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
@@ -61,17 +61,17 @@ import { RolesGuard } from './auth/roles.guard';
     SettingsModule,
     StaffModule,
     PurchasesModule,
-    ReceiptsModule, // <-- ADDED TO IMPORTS ARRAY
-    PaymentsModule, // <-- ADDED TO IMPORTS ARRAY
+    ReceiptsModule,
+    PaymentsModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard, // 1. Ensures every route requires login (unless @Public())
+      useClass: JwtAuthGuard,
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard, // 2. Ensures every route requires specific roles (Deny by Default)
+      useClass: RolesGuard,
     },
   ],
 })
