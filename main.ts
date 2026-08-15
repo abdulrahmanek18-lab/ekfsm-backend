@@ -1,3 +1,6 @@
+// Render cache fix
+import { NestFactory } from '@nestjs/core';
+// ... rest of your code
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
