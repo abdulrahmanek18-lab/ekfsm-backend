@@ -17,6 +17,8 @@ model Company {
   phone       String?
   email       String?
   logoUrl     String?
+  authorizedSignatureUrl String?
+  companySealUrl         String?  
   currency    String   @default("AED")
   timezone    String   @default("Asia/Dubai")
   language    String   @default("en")
