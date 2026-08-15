@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { PaymentsController } from './payments.controller';
-import { PaymentsService } from './payments.service';
+import { ReceiptsController } from './receipts.controller';
+import { ReceiptsService } from './receipts.service';
 
 @Module({
-  controllers: [PaymentsController],
-  providers: [PaymentsService],
+  controllers: [ReceiptsController], // <--- IF THIS IS MISSING, IT WON'T WORK
+  providers: [ReceiptsService],
 })
-export class PaymentsModule {}
+export class ReceiptsModule {}
