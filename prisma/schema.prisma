@@ -346,6 +346,7 @@ model WorkOrder {
   asset             Asset?        @relation(fields: [assetId], references: [id], onDelete: SetNull)
   serviceCategory   ServiceCategory? @relation(fields: [serviceCategoryId], references: [id], onDelete: SetNull)
   technician        User?         @relation(fields: [technicianId], references: [id], onDelete: SetNull)
+  itemsUsed         ItemUsed[]  
   quotation         Quotation?
   invoice           Invoice?
 
