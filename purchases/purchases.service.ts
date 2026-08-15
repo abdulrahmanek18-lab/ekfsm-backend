@@ -1,4 +1,3 @@
-// Cache fix - Render must rebuild this
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -10,7 +9,6 @@ export class PurchasesService {
     const company = await this.prisma.company.findFirst();
     if (!company) throw new Error('No company exists in the database.');
 
-    // Standard Prisma create method (No raw SQL, no UUID casting errors)
     return this.prisma.purchase.create({
       data: {
         supplierName: data.supplierName,
@@ -26,7 +24,7 @@ export class PurchasesService {
         paymentStatus: data.paymentStatus || 'UNPAID',
         paymentMethod: data.paymentMethod || 'CASH',
         receiptUrl: data.receiptUrl || null,
-        companyId: company.id, // Prisma handles the UUID conversion automatically here
+        companyId: company.id,
       },
     });
   }
