@@ -3,7 +3,7 @@ import { PDFDocument } from 'pdf-lib';
 
 @Injectable()
 export class PdfService {
-  // Removed Puppeteer generateFromHtml to save memory on Render
+  // Puppeteer was removed to prevent Render memory crashes.
 
   async fillTemplate(templateBuffer: Buffer, data: Record<string, string>) {
     const pdfDoc = await PDFDocument.load(templateBuffer);
