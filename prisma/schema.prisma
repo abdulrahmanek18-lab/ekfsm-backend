@@ -32,22 +32,22 @@ model Company {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  users       User[]
-  customers   Customer[]
+  users             User[]
+  customers         Customer[]
+  buildings         Building[]
+  assets            Asset[]
+  workOrders        WorkOrder[]
+  invoices          Invoice[]
+  amcs              AMC[]
+  purchaseOrders    PurchaseOrder[]
+  expenses          Expense[]
+  items             InventoryItem[]
+  stockAdjustments  StockAdjustment[]
+  notifications     Notification[]
+  staff             Staff[]
+  purchases         Purchase[]
   receiptVouchers   ReceiptVoucher[]
-  paymentVouchers   PaymentVoucher[]  
-  buildings   Building[]
-  assets      Asset[]
-  workOrders  WorkOrder[]
-  invoices    Invoice[]
-  amcs        AMC[]
-  purchaseOrders PurchaseOrder[]
-  expenses    Expense[]
-  items       InventoryItem[]
-  stockAdjustments StockAdjustment[]
-  notifications Notification[]
-  staff       Staff[]
-  purchases   Purchase[]
+  paymentVouchers   PaymentVoucher[]
 }
 
 model User {
@@ -63,11 +63,11 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  workOrders  WorkOrder[]
-  fcmTokens   FcmToken[]
-  expenses    Expense[] @relation("ExpenseCreatedBy")
-  approvedExpenses Expense[] @relation("ExpenseApprovedBy")
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  workOrders        WorkOrder[]
+  fcmTokens         FcmToken[]
+  expenses          Expense[] @relation("ExpenseCreatedBy")
+  approvedExpenses  Expense[] @relation("ExpenseApprovedBy")
 
   @@index([companyId])
   @@index([role])
@@ -83,49 +83,6 @@ enum UserRole {
   VIEWER
 }
 
-// ── Finance Vouchers (Receipts & Payments) ──
-
-model ReceiptVoucher {
-  id            String    @id @default(uuid())
-  companyId     String
-  voucherNumber String?
-  date          DateTime?
-  customerId    String?
-  invoiceId     String?
-  amount        Float?
-  paymentMode   String?
-  chequeNumber  String?
-  bankName      String?
-  chequeDate    DateTime?
-  chequeStatus  String?
-  description   String?
-  createdAt     DateTime  @default(now())
-
-  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@index([companyId])
-}
-
-model PaymentVoucher {
-  id            String    @id @default(uuid())
-  companyId     String
-  voucherNumber String?
-  date          DateTime?
-  payeeName     String?
-  purchaseId    String?
-  amount        Float?
-  paymentMode   String?
-  chequeNumber  String?
-  bankName      String?
-  chequeDate    DateTime?
-  chequeStatus  String?
-  description   String?
-  createdAt     DateTime  @default(now())
-
-  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-
-  @@index([companyId])
-}
 // ── Services ──
 
 model ServiceCategory {
@@ -391,7 +348,7 @@ model WorkOrder {
   asset             Asset?        @relation(fields: [assetId], references: [id], onDelete: SetNull)
   serviceCategory   ServiceCategory? @relation(fields: [serviceCategoryId], references: [id], onDelete: SetNull)
   technician        User?         @relation(fields: [technicianId], references: [id], onDelete: SetNull)
-  itemsUsed         ItemUsed[]  
+  itemsUsed         ItemUsed[]
   quotation         Quotation?
   invoice           Invoice?
 
@@ -413,6 +370,7 @@ enum WOStatus {
   ASSIGNED
   IN_PROGRESS
   ON_HOLD
+  PENDING_PARTS
   COMPLETED
   CANCELLED
 }
@@ -746,6 +704,50 @@ model Purchase {
   paymentStatus String?
   paymentMethod String?
   receiptUrl    String?
+  createdAt     DateTime  @default(now())
+
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+// ── Finance Vouchers (Receipts & Payments) ──
+
+model ReceiptVoucher {
+  id            String    @id @default(uuid())
+  companyId     String
+  voucherNumber String?
+  date          DateTime?
+  customerId    String?
+  invoiceId     String?
+  amount        Float?
+  paymentMode   String?
+  chequeNumber  String?
+  bankName      String?
+  chequeDate    DateTime?
+  chequeStatus  String?
+  description   String?
+  createdAt     DateTime  @default(now())
+
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+model PaymentVoucher {
+  id            String    @id @default(uuid())
+  companyId     String
+  voucherNumber String?
+  date          DateTime?
+  payeeName     String?
+  purchaseId    String?
+  amount        Float?
+  paymentMode   String?
+  chequeNumber  String?
+  bankName      String?
+  chequeDate    DateTime?
+  chequeStatus  String?
+  description   String?
   createdAt     DateTime  @default(now())
 
   company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
