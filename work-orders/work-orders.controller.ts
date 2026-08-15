@@ -3,7 +3,7 @@ import { WorkOrdersService } from './work-orders.service';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('work-orders')
-@Roles('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COORDINATOR', 'TECHNICIAN') // <--- ADD THIS
+@Roles('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COORDINATOR', 'TECHNICIAN')
 export class WorkOrdersController {
   constructor(private readonly service: WorkOrdersService) {}
 
@@ -20,6 +20,12 @@ export class WorkOrdersController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.service.findOne(id);
+  }
+
+  // NEW: Route for inline status dropdown
+  @Patch(':id/status')
+  updateStatus(@Param('id') id: string, @Body() body: any) {
+    return this.service.updateStatus(id, body.status);
   }
 
   @Patch(':id')
