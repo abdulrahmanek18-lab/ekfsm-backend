@@ -4,44 +4,40 @@ import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
 
   async create(data: any) {
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const company = await this.prisma.company.findFirst();
+    if (!company) throw new Error('No company exists in the database.');
+
+    // Hash the password before saving
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
+
     return this.prisma.user.create({
       data: {
-        ...data,
+        name: data.name,
+        email: data.email,
         password: hashedPassword,
-        companyId: data.companyId || '00000000-0000-0000-0000-000000000001',
-                role: data.role ? data.role.toUpperCase() : 'TECHNICIAN',
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        phone: true,
-        isActive: true,
-        createdAt: true,
+        role: data.role || 'TECHNICIAN',
+        companyId: company.id, // FIX: Link user to company
       },
     });
   }
 
-  findAll() {
+  async findAll() {
     return this.prisma.user.findMany({
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
-        phone: true,
-        isActive: true,
-        createdAt: true,
       },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -49,39 +45,6 @@ export class UsersService {
         name: true,
         email: true,
         role: true,
-        phone: true,
-        isActive: true,
-        createdAt: true,
-      },
-    });
-  }
-
-  update(id: string, data: any) {
-    if (data.password) {
-      delete data.password;
-    }
-    return this.prisma.user.update({
-      where: { id },
-      data,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        phone: true,
-        isActive: true,
-        createdAt: true,
-      },
-    });
-  }
-
-  remove(id: string) {
-    return this.prisma.user.delete({
-      where: { id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
       },
     });
   }
