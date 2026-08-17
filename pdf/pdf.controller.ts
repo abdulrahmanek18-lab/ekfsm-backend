@@ -1,23 +1,14 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Post, Body } from '@nestjs/common';
 import { PdfService } from './pdf.service';
 
-@Controller('pdf')
+@Controller('api/pdf')
 export class PdfController {
   constructor(private readonly service: PdfService) {}
 
   @Post('generate')
-  async generate(@Body() dto: { html: string }, @Res() res: Response) {
+  async generatePdf(@Body() dto: any) {
+    // This will now successfully call the function we added to pdf.service.ts
     const pdf = await this.service.generateFromHtml(dto.html);
-    res.setHeader('Content-Type', 'application/pdf');
-    res.send(pdf);
-  }
-
-  @Post('fill-template')
-  async fillTemplate(@Body() dto: { templateBase64: string; data: Record<string, string> }, @Res() res: Response) {
-    const buffer = Buffer.from(dto.templateBase64, 'base64');
-    const pdf = await this.service.fillTemplate(buffer, dto.data);
-    res.setHeader('Content-Type', 'application/pdf');
-    res.send(Buffer.from(pdf));
+    return { success: true, pdf: pdf.toString('base64') };
   }
 }
