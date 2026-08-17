@@ -1,19 +1,17 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { CompanyService } from './company.service';
-import { Roles } from '../auth/roles.decorator';
 
-@Controller('company')
-@Roles('SUPER_ADMIN', 'ADMIN')
+@Controller('api/company')
 export class CompanyController {
-  constructor(private readonly service: CompanyService) {}
+  constructor(private readonly companyService: CompanyService) {}
 
   @Get()
-  getSettings() {
-    return this.service.getSettings();
+  async getCompany() {
+    return this.companyService.getCompany();
   }
 
   @Post()
-  updateSettings(@Body() body: any) {
-    return this.service.updateSettings(body);
+  async saveCompany(@Body() body: any) {
+    return this.companyService.saveCompany(body);
   }
 }
