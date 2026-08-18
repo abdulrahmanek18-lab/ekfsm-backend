@@ -1,7 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { PdfService } from './pdf.service';
 
-@Controller('api/pdf')
+@Controller('pdf')
 export class PdfController {
   constructor(private readonly service: PdfService) {}
 
