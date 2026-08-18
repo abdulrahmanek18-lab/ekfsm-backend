@@ -1,7 +1,19 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class CompanyService {
+  constructor(private prisma: PrismaService) {}
+
+  async getCompany() {
+    const company = await this.prisma.company.findFirst();
+    return company || {};
+  }
+
+  // FIX: 'data: any' is inside the parentheses!
   async saveCompany(data: any) {
     const existing = await this.prisma.company.findFirst();
     
-    // This object ensures all image fields are passed to Prisma
     const saveData = {
       name: data.name,
       trn: data.trn,
@@ -12,7 +24,6 @@
       invoicePrefix: data.invoicePrefix,
       poPrefix: data.poPrefix,
       woPrefix: data.woPrefix,
-      // Image fields:
       logoUrl: data.logoUrl,
       invoiceHeader: data.invoiceHeader,
       invoiceFooter: data.invoiceFooter,
@@ -31,3 +42,4 @@
       data: saveData,
     });
   }
+}
