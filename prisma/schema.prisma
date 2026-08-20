@@ -671,6 +671,8 @@ model Staff {
   firstName        String
   lastName         String
   photoUrl         String?
+  gender             String?
+  dob                DateTime?  
   jobTitle         String?
   nationality      String?
   phone            String?
